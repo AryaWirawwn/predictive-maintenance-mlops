@@ -6,11 +6,9 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier
 import mlflow
 
-# Setup Config Lokal
 dataPath = 'dataset_mesin_membangun_sistem_machine_learning_preprocessing.csv'
 experimentName = 'Predictive Maintenance - Model'
 
-# Set Tracking URI ke folder lokal di dalam GitHub Actions
 mlflow.set_tracking_uri("file:./mlruns")
 
 def run_model(args):
@@ -40,7 +38,6 @@ def run_model(args):
         print('\nMemulai pelatihan model...')
         mlflow.log_param("data_path", dataPath)
 
-        # Menggunakan parameter dari argumen
         model = RandomForestClassifier(
             n_estimators=args.n_estimators,
             min_samples_split=args.min_samples_split,
@@ -61,7 +58,6 @@ def run_model(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     
-    # Default value sesuai request tuning kamu sebelumnya
     parser.add_argument("--n_estimators", type=int, default=500)
     parser.add_argument("--min_samples_split", type=int, default=5)
     parser.add_argument("--min_samples_leaf", type=int, default=4)

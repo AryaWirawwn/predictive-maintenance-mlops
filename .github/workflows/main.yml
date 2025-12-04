@@ -36,16 +36,13 @@ jobs:
         name: model-artifact-mlruns
         path: MLProject/mlruns/
     
-    - name: Get Latest Run ID
+    - name: Get Run ID from File
       id: get_run_id
       run: |
-        # Cari folder terbaru di mlruns/0/
-        LATEST_RUN_PATH=$(ls -td MLProject/mlruns/0/*/ | head -1)
-        # Ambil nama folder (ID)
-        LATEST_RUN_ID=$(basename "$LATEST_RUN_PATH")
+        RUN_ID=$(cat MLProject/run_id.txt)
         
-        echo "RUN_ID=$LATEST_RUN_ID" >> $GITHUB_ENV
-        echo "Found Run ID: $LATEST_RUN_ID"
+        echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
+        echo "Run ID Found: $RUN_ID"
 
     - name: Login to Docker Hub
       if: success() 

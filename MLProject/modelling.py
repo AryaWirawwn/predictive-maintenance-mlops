@@ -55,6 +55,10 @@ def run_model(args):
         print(f"Pelatihan selesai. Run ID: {run.info.run_id}")
         print(f"Artifacts tersimpan di: {run.info.artifact_uri}")
 
+        with open("run_id.txt", "w") as f:
+            f.write(run.info.run_id)
+        print("Run ID berhasil disimpan ke run_id.txt")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     

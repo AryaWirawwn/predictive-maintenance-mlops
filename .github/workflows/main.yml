@@ -35,7 +35,17 @@ jobs:
       with:
         name: model-artifact-mlruns
         path: MLProject/mlruns/
-
+    
+    - name: Get Latest Run ID
+      id: get_run_id
+      run: |
+        # Cari folder terbaru di mlruns/0/
+        LATEST_RUN_PATH=$(ls -td MLProject/mlruns/0/*/ | head -1)
+        # Ambil nama folder (ID)
+        LATEST_RUN_ID=$(basename "$LATEST_RUN_PATH")
+        
+        echo "RUN_ID=$LATEST_RUN_ID" >> $GITHUB_ENV
+        echo "Found Run ID: $LATEST_RUN_ID"
 
     - name: Login to Docker Hub
       if: success() 
@@ -44,11 +54,18 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
       
-    - name: Build and Push Docker Image
-      if: success()
-      uses: docker/build-push-action@v5
-      with:
-        context: ./MLProject
-        file: ./MLProject/Dockerfile
-        push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/predictive-maintenance:latest
+    - name: Build Docker Image using MLflow
+      env:
+        MLFLOW_TRACKING_URI: file:./MLProject/mlruns
+      run: |
+        echo "Building Docker image for Run ID: ${{ env.RUN_ID }}"
+        
+        # Opsi --enable-mlserver kita gunakan agar serving lebih modern (Python based)
+        mlflow models build-docker \
+          --model-uri "runs:/${{ env.RUN_ID }}/model" \
+          --name "${{ secrets.DOCKER_USERNAME }}/predictive-maintenance:latest" \
+          --enable-mlserver
+    
+    - name: Push Docker Image
+      run: |
+        docker push ${{ secrets.DOCKER_USERNAME }}/predictive-maintenance:latest

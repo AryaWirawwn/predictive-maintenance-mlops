@@ -58,8 +58,12 @@ jobs:
         
         mlflow models build-docker \
           --model-uri "runs:/${{ env.RUN_ID }}/model" \
-          --name "${{ secrets.DOCKER_USERNAME }}/predictive-maintenance:latest" \
+          --name "predictive-maintenance-local" \
           --enable-mlserver
+
+    - name: Tag Docker Image
+      run: |
+        docker tag predictive-maintenance-local ${{ secrets.DOCKER_USERNAME }}/predictive-maintenance:latest
 
     - name: Push Docker Image
       run: |
